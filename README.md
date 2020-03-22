@@ -1,8 +1,10 @@
 # task-scheduler
 
-A timer that can run script or program automatically.
+You can run any script or program automatically.
 
-**You can use this python script to run machine learning training experiments automatically** 
+**You can use this python script to run machine learning training experiments automatically**.
+
+You can also use this script for secondary development.
 
 ## Usage
 
@@ -18,3 +20,9 @@ A timer that can run script or program automatically.
  - run `tasker.py`
 
 - done
+
+## TODO
+
+- [ ] add a task-manager
+- [ ] add a callback function for task
+- [ ] add advance timer feature
