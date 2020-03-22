@@ -13,8 +13,8 @@ class TaskRunner():
         self.task_queue = []
         logging.basicConfig(level=logging.INFO, format='[TaskRunner] %(levelname)s %(message)s at %(asctime)s')
 
-    def load_tasks(self, dir='./'):
-        csv_file = open(dir + 'task_list', 'r')
+    def load_tasks(self, dir='./', file_name='tasklist'):
+        csv_file = open(dir + file_name, 'r')
         reader = csv.DictReader(csv_file)
         for row in reader:
             self.append(row['name'], row['cmd'], row['timeout'])
