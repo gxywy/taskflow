@@ -1,14 +1,14 @@
 # task-scheduler
 
-You can run any script or program automatically.
+You can use this script to run any script or program automatically.
 
-**You can use this python script to run machine learning training experiments automatically**.
+**You can use this script to run machine learning training experiments automatically**.
 
 You can also use this script for secondary development.
 
 ## Usage
 
-- First, edit  `task_list`, write down the task and set timeout like this
+- edit  `task_list`, write down the task and set timeout(second) like this
 
   > name,cmd,timeout,pid
   > train_priority,python "F:\ML\A3C\my-a3c-priority\main.py" --log-dir "F:/ML/A3C/logs/" --exp-name "max" --num-process 2,14400
@@ -20,6 +20,8 @@ You can also use this script for secondary development.
  - run `tasker.py`
 
 - done
+
+
 
 ## TODO
 
