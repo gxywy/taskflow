@@ -13,7 +13,7 @@ class TaskRunner():
         self.task_queue = []
         logging.basicConfig(level=logging.INFO, format='[TaskRunner] %(levelname)s %(message)s at %(asctime)s')
 
-    def load_tasks(self, dir='./', file_name='tasklist'):
+    def load_tasks(self, dir='./', file_name='tasklist.txt'):
         csv_file = open(dir + file_name, 'r')
         reader = csv.DictReader(csv_file)
         for row in reader:
@@ -24,15 +24,13 @@ class TaskRunner():
         self.task_queue.append(task)
     
     def timeout_callback(self):
-        now_task = self.task_queue.pop(0)
+        now_task = self.task_queue[0]
         logging.warning("Task [" + now_task['name'] + "] is terminated by Timer after " + str(now_task['timeout']) + "s")
         os.system("TASKKILL /PID " + str(now_task['pid']) + " /F /T")
 
-        # run next task
-        time.sleep(3)
-        self.run()
-
     def run(self):
+        if len(self.task_queue) == 0:
+            return
         now_task = self.task_queue[0]
         logging.warning("Task [" + now_task['name'] + '] started')
         proc = subprocess.Popen(now_task['cmd'])
@@ -41,9 +39,13 @@ class TaskRunner():
         try:
             timer.start()
             stdout, stderr = proc.communicate()
-            logging.warning("Task [" + now_task['name'] + "] terminated, Timer canceled")
         finally:
+            logging.warning("Task [" + now_task['name'] + "] terminated, Timer canceled")
             timer.cancel()
+
+        # run next task
+        self.task_queue.pop(0)
+        self.run()
 
 
 if __name__ == "__main__":
