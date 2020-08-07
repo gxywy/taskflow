@@ -6,6 +6,12 @@ A web app allows you to run any script or program automatically.
 
 ![](./imgs/index.jpg)
 
+##  Usage
+
+```
+python app.py
+```
+
 
 
 ## TODO
