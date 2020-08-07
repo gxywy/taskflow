@@ -1,0 +1,20 @@
+<div class="modal fade" id="log">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="log-title">Log</h5>
+        </div>
+        <div class="modal-body" id="log-body">
+            <textarea class="form-control" id="log_content" rows="5" readonly="readonly"></textarea>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="cls();">Ok</button>
+                <script>
+                  function cls() {
+                    document.getElementById('log_content').value = ""
+                  }
+                </script>
+            </div>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

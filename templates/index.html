@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Experiments Manager</title>
+		<script src="{{ url_for('static',filename='js/jquery.js') }}"></script>
+		<script src="{{ url_for('static',filename='js/script.js') }}"></script>
+		<script src="{{ url_for('static',filename='js/popper.min.js') }}"></script>
+		<script src="{{ url_for('static',filename='js/bootstrap.min.js') }}"></script>
+		<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.21/datatables.min.js"></script>
+		<link rel="stylesheet" href="{{ url_for('static',filename='css/bootstrap.css') }}">
+		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.21/datatables.min.css"/>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	</head>
+
+	<style>
+		table {
+			table-layout:automatic;
+		}
+		table td{
+			max-width: 300px;
+			overflow: hidden;
+			text-overflow:ellipsis;
+			white-space: nowrap;
+		}
+	</style>
+	<script type="text/javascript">
+		var get_tasks_url = "{{ url_for('get_tasks') }}";
+		var global_start_url = "{{ url_for('run') }}";
+		var global_stop_url = "{{ url_for('stop') }}";
+	</script>
+
+	<body>
+		<div class="container">
+			<br/>
+			<h2>Experiments</h2>
+			<br/>
+			<a onclick="global_start();" id="start_a"><button class="btn btn-success" id="start"><span class="fa fa-play" aria-hidden="true" id="start_span"></span> Start</button></a>
+			<a onclick="new_task();"><button class="btn btn-primary"><span class="fa fa-plus-square" aria-hidden="true"></span> New</button></a>
+			<a onclick="import_tasks();"><button class="btn btn-info"><span class="fa fa-download" aria-hidden="true"></span> Import</button></a>
+			<a onclick="export_tasks();"><button class="btn btn-info"><span class="fa fa-upload" aria-hidden="true"></span> Export</button></a>
+			<a onclick="backup();"><button class="btn btn-secondary"><span class="fa fa-save" aria-hidden="true"></span> Backup</button></a>
+			<br/>
+			<br/>
+
+			<table class="table table-hover " id="main_table">
+				<thead class="thead-dark">
+					<tr>
+						<th>#</th>
+						<th>name</th>
+						<th>PID</th>
+						<th>Command</th>
+						<th>Start time</th>
+						<th>Timeout</th>
+						<th>Status</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody id='dashboard'>
+				</tbody>
+			</table>
+		</div>
+		{% include 'task_detail.html' %}
+		{% include 'log_detail.html' %}
+	</body>
+	<script>
+		jQuery(function($) {
+			$('#main_table').DataTable();
+			$('td').tooltip({container:'body'});
+		});
+	</script>
+</html>
