@@ -39,7 +39,9 @@ class TaskRunner():
         self.save_tasks()
     
     def kill_task(self):
-        os.system("TASKKILL /PID " + str(self.now_task['pid']) + " /F /T")
+        self.proc.kill()
+        self.proc.terminate()
+        #os.system("TASKKILL /PID " + str(self.now_task['pid']) + " /F /T")
 
     def run(self, index=-1):
         self.now_task = None
@@ -68,11 +70,9 @@ class TaskRunner():
         # set timer or not
         if self.now_task['timeout'] != 'inf':
             self.timer = Timer(int(self.now_task['timeout']), self.kill_task)
-            try:
-                self.timer.start()
-                stdout, stderr = self.proc.communicate()
-            finally:
-                self.timer.cancel()
+            self.timer.start()
+            stdout, stderr = self.proc.communicate()
+            self.timer.cancel()
         else:
             stdout, stderr = self.proc.communicate()
         
