@@ -1,0 +1,49 @@
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Log in</title>
+        <script src="{{ url_for('static',filename='js/jquery.js') }}"></script>
+        <link rel="stylesheet" href="{{ url_for('static',filename='css/bootstrap.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static',filename='css/signin.css') }}">
+    </head>
+
+    <body class="text-center">
+        <form class="form-signin">
+        <!-- <img class="mb-4" src="/docs/4.5/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72"> -->
+        <h1 class="h3 mb-3 font-weight-normal">Enter Dashboard</h1>
+        <br>
+        <!-- <label for="inputEmail" class="sr-only">Email address</label>
+        <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus> -->
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+        <!-- <div class="checkbox mb-3">
+            <label>
+            <input type="checkbox" value="remember-me"> Remember me
+            </label>
+        </div>-->
+        <br>
+        <button class="btn btn-primary btn-block" type="submit" onclick="login();">Log in</button>
+        <p class="mt-5 mb-3 text-muted">Powered by Microyu &copy; 2020</p>
+        </form>
+        <script>
+            function login() {
+            var password = document.getElementById("inputPassword").value;
+            $.ajax({
+                type: 'POST',
+                url: "/login",
+                data: {'username': 'admin', 'password': password},
+                success: function (data) {
+                    if (data == 'incorrect') {
+                        alert("Incorrect password.")
+                    }
+                    else {
+                        window.location.href = "/";
+                    }
+                }
+            });
+        }
+        </script>
+    </body>
+</html>

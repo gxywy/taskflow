@@ -1,24 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-__author__ = 'MICROYU'
-
 import os, subprocess, time
 from threading import Timer
-import logging
 import csv
-
-def get_tasklists(path='./tasklists/'):
-    tasklists = []
-    files = os.listdir(path)
-    for file in files:
-        if not os.path.isdir(file):
-            tasklists.append(file)
-    return path, tasklists
-
-def delete_tasklist(dir='./tasklists/', filename='main.txt'):
-    if filename != 'main.txt':
-        os.remove(dir + filename)
 
 class TaskRunner():
     def __init__(self):

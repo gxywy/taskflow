@@ -8,8 +8,14 @@ A web app allows you to run any script or program automatically
 
 ![](./imgs/tasklist.jpg)
 
+![](./imgs/login.jpg)
+
 ##  Usage
 
 ```
 python app.py
 ```
+
+**default password: admin**
+
+and you can change password in file "password" **(recommend)**
