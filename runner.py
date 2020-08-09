@@ -6,7 +6,8 @@ class TaskRunner():
     def __init__(self):
         self.task_queue = []
         self.task_log_queue = []
-        self.global_run = False
+        self.is_running = False
+        self.is_alldone = False
         self.now_task = None
         self.timer = None
         self.proc = None
@@ -39,16 +40,17 @@ class TaskRunner():
         self.save_tasks()
     
     def kill_task(self):
-        self.proc.kill()
-        self.proc.terminate()
-        #os.system("TASKKILL /PID " + str(self.now_task['pid']) + " /F /T")
+        #self.proc.kill()
+        #self.proc.terminate()
+        os.system("TASKKILL /PID " + str(self.now_task['pid']) + " /F /T")
 
     def run(self, index=-1):
+        self.is_running = True
+        self.is_alldone = False
         self.now_task = None
         now_task_index = 0
 
         if index == -1:     # global run
-            self.global_run = True
             for task in self.task_queue:
                 if task['status'] == 'ready':
                     self.now_task = task
@@ -57,7 +59,6 @@ class TaskRunner():
             if self.now_task is None:
                 return
         else:               # single run
-            self.global_run = False
             self.now_task = self.task_queue[index]
             now_task_index = index
 
@@ -70,23 +71,33 @@ class TaskRunner():
         # set timer or not
         if self.now_task['timeout'] != 'inf':
             self.timer = Timer(int(self.now_task['timeout']), self.kill_task)
-            self.timer.start()
-            stdout, stderr = self.proc.communicate()
-            self.timer.cancel()
+            try:
+                self.timer.start()
+                stdout, stderr = self.proc.communicate()
+            finally:
+                self.timer.cancel()
         else:
             stdout, stderr = self.proc.communicate()
         
         # after run
         self.task_log_queue[now_task_index] = stdout
 
-        if self.global_run:
+        if self.is_running:
             self.now_task['status'] = 'done'
             self.run()
         else:
             self.now_task['status'] = 'ready'
 
+        for task in self.task_queue:
+            if task['status'] != 'done':
+                self.is_alldone = False
+                break
+            else:
+                self.is_alldone = True
+                self.is_running = False
+
     def stop(self):
-        self.global_run = False
+        self.is_running = False
         if self.timer is not None:
             self.timer.cancel()
         self.kill_task()
@@ -94,15 +105,9 @@ class TaskRunner():
     def reset_status(self):
         for task in self.task_queue:
             task['status'] = 'ready'
-    
-    def is_alldone(self):
-        for task in self.task_queue:
-            if task['status'] != 'done':
-                return False
-        return True
 
     def reset(self):
-        self.global_run = False
+        self.is_running = False
         self.task_queue = []
         self.task_log_queue = []
 
@@ -111,6 +116,20 @@ class TaskRunner():
         self.task_log_queue.pop(int(index))
         self.save_tasks()
 
+    def order_up(self, index):
+        index = int(index)
+        temp = self.task_queue[index]
+        self.task_queue[index] = self.task_queue[index - 1]
+        self.task_queue[index - 1] = temp
+        self.save_tasks()
+    
+    def order_down(self, index):
+        index = int(index)
+        temp = self.task_queue[index]
+        self.task_queue[index] = self.task_queue[index + 1]
+        self.task_queue[index + 1] = temp
+        self.save_tasks()
+    
     def edit(self, index, name, cmd, timeout):
         index = int(index)
         self.task_queue[index]['name'] = name

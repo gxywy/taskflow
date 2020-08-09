@@ -59,6 +59,25 @@ function delete_task(index) {
 	});
 }
 
+function order_up(index) {
+	$.ajax({
+		type: 'POST',
+		url: "/order_up",
+		data: {'index': index},
+		success: function (data) {
+		}
+	});
+}
+
+function order_down(index) {
+	$.ajax({
+		type: 'POST',
+		url: "/order_down",
+		data: {'index': index},
+		success: function (data) {
+		}
+	});
+}
 var now_index = null;
 function edit_task(index) {
 	$("#task").modal("show");

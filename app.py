@@ -25,12 +25,12 @@ def login():
 @app.route('/')
 def dashboard():
     if 'username' not in session: return render_template('login.html')
-    return render_template('index.html', records=runner.task_queue)
+    return render_template('index.html', records=runner.task_queue, status=runner.is_alldone)
 
 @app.route('/get_tasks', methods=['GET'])
 def get_tasks():
     if 'username' in session:
-        return render_template('dashboard.html', records=runner.task_queue)
+        return render_template('dashboard.html', records=runner.task_queue, status=runner.is_alldone)
     else:
         return '<div class="spinner-grow text-primary" role="status"><span class="sr-only">Loading...</span></div>'
 
@@ -44,8 +44,21 @@ def get_task():
 @app.route('/delete_task', methods=['POST'])
 def delete():
     if 'username' not in session: return render_template('login.html')
-    runner.delete(request.form['index'])
+    index = int(request.form['index'])
+    runner.delete(index)
     return 'delete'
+
+@app.route('/order_up', methods=['POST'])
+def order_up():
+    if 'username' not in session: return render_template('login.html')
+    runner.order_up(request.form['index'])
+    return 'order_up'
+
+@app.route('/order_down', methods=['POST'])
+def order_down():
+    if 'username' not in session: return render_template('login.html')
+    runner.order_down(request.form['index'])
+    return 'order_down'
 
 @app.route('/add_task', methods=['POST'])
 def add():
@@ -68,7 +81,7 @@ def get_log():
 @app.route('/global_start', methods=['GET'])
 def run():
     if 'username' not in session: return render_template('login.html')
-    if runner.is_alldone():
+    if runner.is_alldone:
         runner.reset_status()
     runner.run()
     return 'start'

@@ -19,8 +19,3 @@ python app.py
 **default password: admin**
 
 and you can change password in file "password" **(recommend)**
-
-## Todo
-
-- [ ] run single task
-- [ ] change task order

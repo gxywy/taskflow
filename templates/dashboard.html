@@ -19,11 +19,23 @@
     {% endif %}
     <td>
     <!-- controls based on crontab state -->
-    <a onclick="show_log('{{ loop.index0 }}');"><button class="btn btn-outline-primary btn-sm"><span class="fa fa-list-alt" aria-hidden="true"></span> Logs</button></a>
+    <!-- <a onclick="run_task('{{ loop.index0 }}');"><button class="btn btn-outline-success btn-sm"><span class="fa fa-play" aria-hidden="true"></span></button></a> -->
+
+    <a onclick="show_log('{{ loop.index0 }}');"><button class="btn btn-outline-primary btn-sm"><span class="fa fa-list-alt" aria-hidden="true"></span></button></a>
     {% if row['status'] != 'running'%}
-        <a onclick="edit_task('{{ loop.index0 }}');"><button class="btn btn-outline-primary btn-sm"><span class="fa fa-edit" aria-hidden="true"></span> Edit</button></a>
+        <a onclick="edit_task('{{ loop.index0 }}');"><button class="btn btn-outline-primary btn-sm"><span class="fa fa-edit" aria-hidden="true"></span></button></a>
     {% endif %}
+    
     <a onclick="delete_task('{{ loop.index0 }}');"><button class="btn btn-outline-danger btn-sm"><span class="fa fa-trash" aria-hidden="true"></span></button></a>
+    
+    {% if row['status'] == 'ready' or status %}
+        {% if (loop.index0 != 0) and (records[loop.index0 - 1].status == 'ready' or status) %}
+            <a onclick="order_up('{{ loop.index0 }}');"><button class="btn btn-outline-info btn-sm"><span class="fa fa-long-arrow-up" aria-hidden="true"></span></button></a>
+        {% endif %}
+        {% if loop.index != records | length %}
+            <a onclick="order_down('{{ loop.index0 }}');"><button class="btn btn-outline-info btn-sm"><span  class="fa fa-long-arrow-down" aria-hidden="true"></span></button></a>
+        {% endif %}
+    {% endif %}
     </td>
     </tr>
 {% endfor %}
