@@ -6,6 +6,7 @@ class TaskRunner():
     def __init__(self):
         self.task_queue = []
         self.task_log_queue = []
+        self.global_run = False
         self.now_task = None
         self.timer = None
         self.proc = None
@@ -37,27 +38,36 @@ class TaskRunner():
         self.task_log_queue.append("")
         self.save_tasks()
     
-    def timeout_callback(self):
+    def kill_task(self):
         os.system("TASKKILL /PID " + str(self.now_task['pid']) + " /F /T")
 
-    def run(self):
+    def run(self, index=-1):
         self.now_task = None
         now_task_index = 0
-        for task in self.task_queue:
-            if task['status'] == 'ready':
-                self.now_task = task
-                now_task_index = self.task_queue.index(task)
-                break
-        if self.now_task is None:
-            return
+
+        if index == -1:     # global run
+            self.global_run = True
+            for task in self.task_queue:
+                if task['status'] == 'ready':
+                    self.now_task = task
+                    now_task_index = self.task_queue.index(task)
+                    break
+            if self.now_task is None:
+                return
+        else:               # single run
+            self.global_run = False
+            self.now_task = self.task_queue[index]
+            now_task_index = index
+
+        # run task
         self.now_task['status'] = 'running'
         self.now_task['start_time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) 
-        
         self.proc = subprocess.Popen(self.now_task['cmd'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         self.now_task['pid'] = self.proc.pid
         
+        # set timer or not
         if self.now_task['timeout'] != 'inf':
-            self.timer = Timer(int(self.now_task['timeout']), self.timeout_callback)
+            self.timer = Timer(int(self.now_task['timeout']), self.kill_task)
             try:
                 self.timer.start()
                 stdout, stderr = self.proc.communicate()
@@ -65,31 +75,34 @@ class TaskRunner():
                 self.timer.cancel()
         else:
             stdout, stderr = self.proc.communicate()
+        
+        # after run
         self.task_log_queue[now_task_index] = stdout
 
-        if self.is_running():
+        if self.global_run:
             self.now_task['status'] = 'done'
             self.run()
+        else:
+            self.now_task['status'] = 'ready'
 
     def stop(self):
+        self.global_run = False
         if self.timer is not None:
             self.timer.cancel()
-        self.timeout_callback()
-        for task in self.task_queue:
-            if task['status'] == 'running':
-                task['status'] = 'ready'
+        self.kill_task()
 
     def reset_status(self):
         for task in self.task_queue:
             task['status'] = 'ready'
     
-    def is_running(self):
+    def is_alldone(self):
         for task in self.task_queue:
-            if task['status'] == 'running':
-                return True
-        return False
+            if task['status'] != 'done':
+                return False
+        return True
 
     def reset(self):
+        self.global_run = False
         self.task_queue = []
         self.task_log_queue = []
 

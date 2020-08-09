@@ -29,8 +29,10 @@ def dashboard():
 
 @app.route('/get_tasks', methods=['GET'])
 def get_tasks():
-    if 'username' not in session: return render_template('login.html')
-    return render_template('dashboard.html', records=runner.task_queue)
+    if 'username' in session:
+        return render_template('dashboard.html', records=runner.task_queue)
+    else:
+        return '<div class="spinner-grow text-primary" role="status"><span class="sr-only">Loading...</span></div>'
 
 # for task
 @app.route('/get_task', methods=['POST'])
@@ -60,13 +62,13 @@ def edit():
 @app.route('/get_log', methods=['POST'])
 def get_log():
     if 'username' not in session: return render_template('login.html')
-    return runner.get_log(request.form['index'])
+    return runner.get_log(request.form['index']).decode('gbk', 'ignore')
 
 # for main
 @app.route('/global_start', methods=['GET'])
 def run():
     if 'username' not in session: return render_template('login.html')
-    if not runner.is_running():
+    if runner.is_alldone():
         runner.reset_status()
     runner.run()
     return 'start'
@@ -111,6 +113,6 @@ def download(filename):
     return send_from_directory('tasklists', filename, as_attachment=True) 
 
 if __name__ == '__main__':
-    app.debug = True
+    app.debug = False
     app.secret_key = os.urandom(24)
     app.run()
