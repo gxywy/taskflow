@@ -6,14 +6,14 @@
     <td>{{ loop.index }}</td>
     <td>{{ row.name }}</td>
     <td>{{ row.pid }}</td>
-    <td data-toggle="tooltip" data-placement="top" title="Tooltip">{{ row.cmd }}</td>
+    <td>{{ row.cmd }}</td>
     <td>{{ row.start_time }}</td>
     <td>{{ row.timeout }}</td>
     
     {% if row.status == 'done'%}
     <td><span class="badge badge-success">{{ row.status }}</span></td>
     {% elif row.status == 'ready'%}
-    <td><span class="badge badge-primary">{{ row.status }}</span></td>
+    <td><span class="badge badge-primary">{{ row.status }}<small></td>
     {% elif row.status == 'running'%}
     <td><span class="badge badge-danger">{{ row.status }}</span></td>
     {% endif %}
@@ -21,7 +21,7 @@
     <!-- controls based on crontab state -->
     <a onclick="show_log('{{ loop.index0 }}');"><button class="btn btn-outline-primary btn-sm"><span class="fa fa-list-alt" aria-hidden="true"></span> Logs</button></a>
     {% if row['status'] != 'running'%}
-        <a onclick="edit_task('{{ loop.index0 }}', '{{ row.name }}', '{{ row.cmd }}', '{{ row.timeout }}');"><button class="btn btn-outline-primary btn-sm"><span class="fa fa-edit" aria-hidden="true"></span> Edit</button></a>
+        <a onclick="edit_task('{{ loop.index0 }}');"><button class="btn btn-outline-primary btn-sm"><span class="fa fa-edit" aria-hidden="true"></span> Edit</button></a>
     {% endif %}
     <a onclick="delete_task('{{ loop.index0 }}');"><button class="btn btn-outline-danger btn-sm"><span class="fa fa-trash" aria-hidden="true"></span></button></a>
     </td>

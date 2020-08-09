@@ -25,6 +25,34 @@
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="task-ok" onclick="save_change();">Add Task</button>
             </div>
+            <script>
+              function save_change() {
+                var name = document.getElementById("task_name").value;
+                var timeout = document.getElementById("task_timeout").value;
+                var command = document.getElementById("task_command").value;
+                
+                if (document.getElementById("task-title").innerText == "Edit Task")
+                {
+                  $.ajax({
+                    type: 'POST',
+                    url: "/edit_task",
+                    data: {'index': now_index, 'name': name, 'timeout': timeout, 'cmd': command},
+                    success: function (data) {
+                    }
+                  });
+                }
+                else
+                {
+                  $.ajax({
+                    type: 'POST',
+                    url: "/add_task",
+                    data: {'name': name, 'timeout': timeout, 'cmd': command},
+                    success: function (data) {
+                    }
+                  });
+                }
+              }
+            </script>
         </div> 
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

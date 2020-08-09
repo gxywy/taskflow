@@ -3,13 +3,13 @@ function global_start() {
 	var url;
 	if (btn.className == "btn btn-success")
 	{
-		url = global_start_url
+		url = '/global_start'
 		btn.className = "btn btn-danger";
-		btn.innerHTML = '<span class="fa fa-stop" aria-hidden="true" id="start_span"></span> Stop All';
+		btn.innerHTML = '<span class="fa fa-stop" aria-hidden="true" id="start_span"></span> Stop';
 	}
 	else
 	{
-		url = global_stop_url
+		url = '/global_stop'
 		btn.className = "btn btn-success";
 		btn.innerHTML = '<span class="fa fa-play" aria-hidden="true" id="start_span"></span> Start';
 	}
@@ -19,6 +19,34 @@ function global_start() {
 		success: function () {
 		}
 	});
+}
+
+function tasklists() {
+	$("#load").modal("show");
+	$.ajax({
+		type: 'GET',
+		url: '/get_lists',
+		success: function (data) {
+			var html;
+			for (i in data.files) {
+				html += '<option>' + data.files[i] + '</option>'
+			}
+			document.getElementById("loadSelect").innerHTML = html;
+		}
+	});
+}
+
+function save_list() {
+	$("#backup").modal("show");
+}
+
+function new_task() {
+	$("#task").modal("show");
+	document.getElementById("task-title").innerText = "New Task";
+	document.getElementById("task-ok").innerText = "Add Task";
+	document.getElementById("task_name").value = "";
+	document.getElementById("task_timeout").value = "";
+	document.getElementById("task_command").value = "";
 }
 
 function delete_task(index) {
@@ -31,51 +59,22 @@ function delete_task(index) {
 	});
 }
 
-function new_task() {
-	$("#task").modal("show");
-	document.getElementById("task-title").innerText = "New Task";
-	document.getElementById("task-ok").innerText = "Add Task";
-	document.getElementById("task_name").value = "";
-	document.getElementById("task_timeout").value = "";
-	document.getElementById("task_command").value = "";
-}
-
 var now_index = null;
-function edit_task(index, name, cmd, timeout) {
+function edit_task(index) {
 	$("#task").modal("show");
-	document.getElementById("task-title").innerText = "Edit Task";
-	document.getElementById("task-ok").innerText = "Save Changes";
-	document.getElementById("task_name").value = name;
-	document.getElementById("task_timeout").value = timeout;
-	document.getElementById("task_command").value = cmd;
 	now_index = index
-}
-
-function save_change() {
-	var name = document.getElementById("task_name").value;
-	var timeout = document.getElementById("task_timeout").value;
-	var command = document.getElementById("task_command").value;
-	
-	if (document.getElementById("task-title").innerText == "Edit Task")
-	{
-		$.ajax({
-			type: 'POST',
-			url: "/edit_task",
-			data: {'index': now_index, 'name': name, 'timeout': timeout, 'cmd': command},
-			success: function (data) {
-			}
-		});
-	}
-	else
-	{
-		$.ajax({
-			type: 'POST',
-			url: "/add_task",
-			data: {'name': name, 'timeout': timeout, 'cmd': command},
-			success: function (data) {
-			}
-		});
-	}
+	$.ajax({
+		type: 'POST',
+		url: "/get_task",
+		data: {'index': now_index},
+		success: function (data) {
+			document.getElementById("task-title").innerText = "Edit Task";
+			document.getElementById("task-ok").innerText = "Save Changes";
+			document.getElementById("task_name").value = data.name;
+			document.getElementById("task_timeout").value = data.timeout;
+			document.getElementById("task_command").value = data.cmd;
+		}
+	});
 }
 
 function show_log(index) {
@@ -85,12 +84,12 @@ function show_log(index) {
 		url: "/get_log",
 		data: {'index': index},
 		success: function (data) {
-			document.getElementById('log_content').value = data
+			document.getElementById('log_content').value = data;
 		}
 	});
 }
 
-setInterval(get_tasks, 300);
+setInterval(get_tasks, 500);
 function get_tasks() {
 	$.ajax({
 		type: 'GET',

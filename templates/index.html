@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 	<head>
-		<title>Experiments Manager</title>
+		<title>Task Manager</title>
 		<script src="{{ url_for('static',filename='js/jquery.js') }}"></script>
 		<script src="{{ url_for('static',filename='js/script.js') }}"></script>
 		<script src="{{ url_for('static',filename='js/popper.min.js') }}"></script>
@@ -23,22 +23,17 @@
 			white-space: nowrap;
 		}
 	</style>
-	<script type="text/javascript">
-		var get_tasks_url = "{{ url_for('get_tasks') }}";
-		var global_start_url = "{{ url_for('run') }}";
-		var global_stop_url = "{{ url_for('stop') }}";
-	</script>
 
 	<body>
 		<div class="container">
 			<br/>
-			<h2>Experiments</h2>
+			<h2>Dashboard</h2>
 			<br/>
 			<a onclick="global_start();" id="start_a"><button class="btn btn-success" id="start"><span class="fa fa-play" aria-hidden="true" id="start_span"></span> Start</button></a>
 			<a onclick="new_task();"><button class="btn btn-primary"><span class="fa fa-plus-square" aria-hidden="true"></span> New</button></a>
-			<a onclick="import_tasks();"><button class="btn btn-info"><span class="fa fa-download" aria-hidden="true"></span> Import</button></a>
-			<a onclick="export_tasks();"><button class="btn btn-info"><span class="fa fa-upload" aria-hidden="true"></span> Export</button></a>
-			<a onclick="backup();"><button class="btn btn-secondary"><span class="fa fa-save" aria-hidden="true"></span> Backup</button></a>
+			<a onclick="tasklists();"><button class="btn btn-info"><span class="fa fa-tasks" aria-hidden="true"></span> Lists</button></a>
+			<a onclick="save_list();"><button class="btn btn-info"><span class="fa fa-save" aria-hidden="true"></span> Save</button></a>
+			<a href="/download/main.txt" target="_black"><button class="btn btn-secondary"><span class="fa fa-cloud-download" aria-hidden="true"></span> Export</button></a>
 			<br/>
 			<br/>
 
@@ -61,11 +56,12 @@
 		</div>
 		{% include 'task_detail.html' %}
 		{% include 'log_detail.html' %}
+		{% include 'save_list.html' %}
+		{% include 'load_list.html' %}
 	</body>
 	<script>
 		jQuery(function($) {
 			$('#main_table').DataTable();
-			$('td').tooltip({container:'body'});
 		});
 	</script>
 </html>

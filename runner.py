@@ -8,21 +8,41 @@ from threading import Timer
 import logging
 import csv
 
+def get_tasklists(path='./tasklists/'):
+    tasklists = []
+    files = os.listdir(path)
+    for file in files:
+        if not os.path.isdir(file):
+            tasklists.append(file)
+    return path, tasklists
+
+def delete_tasklist(dir='./tasklists/', filename='main.txt'):
+    if filename != 'main.txt':
+        os.remove(dir + filename)
+
 class TaskRunner():
     def __init__(self):
         self.task_queue = []
         self.task_log_queue = []
         self.now_task = None
         self.timer = None
+        self.proc = None
 
-    def load_tasks(self, dir='./', file_name='tasklist.txt'):
-        csv_file = open(dir + file_name, 'r')
+    def load_tasks(self, dir='./tasklists/', filename='main.txt'):
+        self.reset()
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+        if not os.path.exists(dir + filename):
+            ## os.mknod is not available on Windows
+            f = open(dir + filename, 'w')
+            f.close()
+        csv_file = open(dir + filename, 'r')
         reader = csv.DictReader(csv_file)
         for row in reader:
             self.add(row['name'], row['cmd'], row['timeout'])
 
-    def save_tasks(self, dir='./', file_name='tasklist.txt'):
-        csv_file = open(dir + file_name, 'w')
+    def save_tasks(self, dir='./tasklists/', filename='main.txt'):
+        csv_file = open(dir + filename, 'w')
         writer = csv.DictWriter(csv_file, fieldnames=('name', 'cmd', 'timeout'), lineterminator = '\n')
         writer.writeheader()
         for task in self.task_queue:
@@ -51,34 +71,46 @@ class TaskRunner():
         self.now_task['status'] = 'running'
         self.now_task['start_time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) 
         
-        proc = subprocess.Popen(self.now_task['cmd'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        self.now_task['pid'] = proc.pid
+        self.proc = subprocess.Popen(self.now_task['cmd'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        self.now_task['pid'] = self.proc.pid
         
         if self.now_task['timeout'] != 'inf':
             self.timer = Timer(int(self.now_task['timeout']), self.timeout_callback)
             try:
                 self.timer.start()
-                stdout, stderr = proc.communicate()
+                stdout, stderr = self.proc.communicate()
             finally:
                 self.timer.cancel()
         else:
-            stdout, stderr = proc.communicate()
+            stdout, stderr = self.proc.communicate()
         self.task_log_queue[now_task_index] = stdout
 
-        # run next task
-        #self.task_queue.pop(0)
-        self.now_task['status'] = 'done'
-        self.run()
+        if self.is_running():
+            self.now_task['status'] = 'done'
+            self.run()
 
     def stop(self):
-        self.timer.cancel()
+        if self.timer is not None:
+            self.timer.cancel()
+        self.timeout_callback()
         for task in self.task_queue:
-            task['status'] = 'done'
+            if task['status'] == 'running':
+                task['status'] = 'ready'
 
-    def reset(self):
+    def reset_status(self):
         for task in self.task_queue:
             task['status'] = 'ready'
     
+    def is_running(self):
+        for task in self.task_queue:
+            if task['status'] == 'running':
+                return True
+        return False
+
+    def reset(self):
+        self.task_queue = []
+        self.task_log_queue = []
+
     def delete(self, index):
         self.task_queue.pop(int(index))
         self.task_log_queue.pop(int(index))
@@ -90,6 +122,10 @@ class TaskRunner():
         self.task_queue[index]['cmd'] = cmd
         self.task_queue[index]['timeout'] = timeout
         self.save_tasks()
+    
+    def get(self, index):
+        index = int(index)
+        return self.task_queue[index]['name'], self.task_queue[index]['cmd'], self.task_queue[index]['timeout']
 
     def get_log(self, index):
         return self.task_log_queue[int(index)]
