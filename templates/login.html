@@ -32,14 +32,14 @@
             var password = document.getElementById("inputPassword").value;
             $.ajax({
                 type: 'POST',
-                url: "/login",
+                url: "{{ url_for('login') }}",
                 data: {'username': 'admin', 'password': password},
                 success: function (data) {
                     if (data == 'incorrect') {
                         alert("Incorrect password.")
                     }
                     else {
-                        window.location.href = "/";
+                        window.location.href = "{{ url_for('dashboard') }}";
                     }
                 }
             });

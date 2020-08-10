@@ -3,13 +3,13 @@ function global_start() {
 	var url;
 	if (btn.className == "btn btn-success")
 	{
-		url = '/global_start'
+		url = global_start_url
 		btn.className = "btn btn-danger";
 		btn.innerHTML = '<span class="fa fa-stop" aria-hidden="true" id="start_span"></span> Stop';
 	}
 	else
 	{
-		url = '/global_stop'
+		url = global_stop_url
 		btn.className = "btn btn-success";
 		btn.innerHTML = '<span class="fa fa-play" aria-hidden="true" id="start_span"></span> Start';
 	}
@@ -25,7 +25,7 @@ function tasklists() {
 	$("#load").modal("show");
 	$.ajax({
 		type: 'GET',
-		url: '/get_lists',
+		url: get_lists_url,
 		success: function (data) {
 			var html;
 			for (i in data.files) {
@@ -52,7 +52,7 @@ function new_task() {
 function delete_task(index) {
 	$.ajax({
 		type: 'POST',
-		url: "/delete_task",
+		url: delete_task_url,
 		data: {'index': index},
 		success: function (data) {
 		}
@@ -62,7 +62,7 @@ function delete_task(index) {
 function order_up(index) {
 	$.ajax({
 		type: 'POST',
-		url: "/order_up",
+		url: order_up_url,
 		data: {'index': index},
 		success: function (data) {
 		}
@@ -72,7 +72,7 @@ function order_up(index) {
 function order_down(index) {
 	$.ajax({
 		type: 'POST',
-		url: "/order_down",
+		url: order_down_url,
 		data: {'index': index},
 		success: function (data) {
 		}
@@ -84,7 +84,7 @@ function edit_task(index) {
 	now_index = index
 	$.ajax({
 		type: 'POST',
-		url: "/get_task",
+		url: get_task_url,
 		data: {'index': now_index},
 		success: function (data) {
 			document.getElementById("task-title").innerText = "Edit Task";
@@ -100,7 +100,7 @@ function show_log(index) {
 	$("#log").modal("show");
 	$.ajax({
 		type: 'POST',
-		url: "/get_log",
+		url: get_log_url,
 		data: {'index': index},
 		success: function (data) {
 			document.getElementById('log_content').value = data;
@@ -112,7 +112,7 @@ setInterval(get_tasks, 500);
 function get_tasks() {
 	$.ajax({
 		type: 'GET',
-		url: "/get_tasks",
+		url: get_tasks_url,
 		success: function (data) {
 			if (data.search("running") == -1)
 			{

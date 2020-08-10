@@ -42,7 +42,7 @@
               }
               $.ajax({
                 type: 'POST',
-                url: "/backup",
+                url: "{{ url_for('backup') }}",
                 data: {'filename': filename, 'use_time': use_time},
                 success: function (data) {
                 }

@@ -11,6 +11,18 @@
 		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.21/datatables.min.css"/>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 	</head>
+	
+	<script type="text/javascript">
+		var global_start_url = "{{ url_for('global_start') }}";
+		var global_stop_url = "{{ url_for('global_stop') }}";
+		var get_lists_url = "{{ url_for('get_lists') }}";
+		var delete_task_url = "{{ url_for('delete_task') }}";
+		var order_up_url = "{{ url_for('order_up') }}";
+		var order_down_url = "{{ url_for('order_down') }}";
+		var get_task_url = "{{ url_for('get_task') }}";
+		var get_log_url = "{{ url_for('get_log') }}";
+		var get_tasks_url = "{{ url_for('get_tasks') }}";
+	</script>
 
 	<style>
 		table {
@@ -33,7 +45,7 @@
 			<a onclick="new_task();"><button class="btn btn-primary"><span class="fa fa-plus-square" aria-hidden="true"></span> New</button></a>
 			<a onclick="tasklists();"><button class="btn btn-info"><span class="fa fa-tasks" aria-hidden="true"></span> Lists</button></a>
 			<a onclick="save_list();"><button class="btn btn-info"><span class="fa fa-save" aria-hidden="true"></span> Save</button></a>
-			<a href="/download/main.txt" target="_black"><button class="btn btn-secondary"><span class="fa fa-cloud-download" aria-hidden="true"></span> Export</button></a>
+			<a href="{{ url_for('download', filename='main.txt') }}" target="_black"><button class="btn btn-secondary"><span class="fa fa-cloud-download" aria-hidden="true"></span> Export</button></a>
 			<br/>
 			<br/>
 

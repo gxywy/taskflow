@@ -1,10 +1,11 @@
 from flask import Flask
-from flask import render_template, request, redirect, url_for, send_from_directory, session
+from flask import render_template, request, send_from_directory, session
 from runner import TaskRunner
 from utils import *
 import time, os
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 runner = TaskRunner()
 runner.load_tasks()
 
@@ -42,7 +43,7 @@ def get_task():
     return {'name': name, 'cmd': cmd, 'timeout': timeout}
 
 @app.route('/delete_task', methods=['POST'])
-def delete():
+def delete_task():
     if 'username' not in session: return render_template('login.html')
     index = int(request.form['index'])
     runner.delete(index)
@@ -61,13 +62,13 @@ def order_down():
     return 'order_down'
 
 @app.route('/add_task', methods=['POST'])
-def add():
+def add_task():
     if 'username' not in session: return render_template('login.html')
     runner.add(request.form['name'], request.form['cmd'], request.form['timeout'])
     return 'add'
 
 @app.route('/edit_task', methods=['POST'])
-def edit():
+def edit_task():
     if 'username' not in session: return render_template('login.html')
     runner.edit(request.form['index'], request.form['name'], request.form['cmd'], request.form['timeout'])
     return 'edit'
@@ -79,7 +80,7 @@ def get_log():
 
 # for main
 @app.route('/global_start', methods=['GET'])
-def run():
+def global_start():
     if 'username' not in session: return render_template('login.html')
     if runner.is_alldone:
         runner.reset_status()
@@ -87,7 +88,7 @@ def run():
     return 'start'
 
 @app.route('/global_stop', methods=['GET'])
-def stop():
+def global_stop():
     if 'username' not in session: return render_template('login.html')
     runner.stop()
     return 'stop'
@@ -126,6 +127,5 @@ def download(filename):
     return send_from_directory('tasklists', filename, as_attachment=True) 
 
 if __name__ == '__main__':
-    app.debug = False
-    app.secret_key = os.urandom(24)
+    app.debug = True
     app.run()

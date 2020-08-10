@@ -24,7 +24,7 @@
               var select = document.getElementById('loadSelect').value;
               $.ajax({
                 type: 'POST',
-                url: "/delete_list",
+                url: "{{ url_for('delete_list') }}",
                 data: {'filename': select},
                 success: function (data) {
                 }
@@ -35,7 +35,7 @@
               var select = document.getElementById('loadSelect').value;
               $.ajax({
                 type: 'POST',
-                url: "/load_list",
+                url: "{{ url_for('load_list') }}",
                 data: {'filename': select},
                 success: function (data) {
                 }
