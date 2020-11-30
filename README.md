@@ -1,4 +1,4 @@
-# task-manager
+# Taskflow
 
 A web app allows you to run any script or program automatically
 
@@ -13,7 +13,7 @@ A web app allows you to run any script or program automatically
 ##  Usage
 
 ```
-python app.py
+python taskflow.py
 ```
 
 **default password: admin**
