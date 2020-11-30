@@ -1,6 +1,8 @@
+from logging import error
 import os, subprocess, time
 from threading import Timer
 import csv
+import logging, sys
 
 class TaskRunner():
     def __init__(self):
@@ -11,6 +13,7 @@ class TaskRunner():
         self.now_task = None
         self.timer = None
         self.proc = None
+        logging.basicConfig(level=logging.INFO, format='[TaskRunner] %(levelname)s %(message)s at %(asctime)s')
 
     def load_tasks(self, dir='./tasklists/', filename='main.txt'):
         self.reset()
@@ -64,23 +67,41 @@ class TaskRunner():
 
         # run task
         self.now_task['status'] = 'running'
-        self.now_task['start_time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) 
-        self.proc = subprocess.Popen(self.now_task['cmd'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        self.now_task['start_time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        
+        env = os.environ.copy()
+        env['PYTHONUNBUFFERED'] = '1'
+        self.proc = subprocess.Popen(self.now_task['cmd'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, env=env)
         self.now_task['pid'] = self.proc.pid
+        logging.warning("Task [" + self.now_task['name'] + '] started')
         
         # set timer or not
         if self.now_task['timeout'] != 'inf':
             self.timer = Timer(int(self.now_task['timeout']), self.kill_task)
-            try:
-                self.timer.start()
-                stdout, stderr = self.proc.communicate()
-            finally:
-                self.timer.cancel()
+            self.timer.start()
+            #stdout, stderr = self.proc.communicate()
+            while True:
+                output = self.proc.stdout.readline()
+                output = str(output.strip(), encoding="gb2312", errors="ignore")
+                if self.proc.poll() is not None and output == '':
+                    self.timer.cancel()
+                    break
+                if output:
+                    print(output)
+                    self.task_log_queue[now_task_index] += output + "\n"
         else:
-            stdout, stderr = self.proc.communicate()
-        
+            #stdout, stderr = self.proc.communicate()
+            while True:
+                output = self.proc.stdout.readline()
+                output = str(output.strip(), encoding="gb2312", errors="ignore")
+                if self.proc.poll() is not None and output == '':
+                    break
+                if output:
+                    print(output)
+                    self.task_log_queue[now_task_index] += output + "\n"
+
         # after run
-        self.task_log_queue[now_task_index] = stdout
+        logging.warning("Task [" + self.now_task['name'] + "] terminated")
 
         if self.is_running:
             self.now_task['status'] = 'done'

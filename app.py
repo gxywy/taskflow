@@ -2,12 +2,18 @@ from flask import Flask
 from flask import render_template, request, send_from_directory, session
 from runner import TaskRunner
 from utils import *
-import time, os
+import time, os, sys
+import logging
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 runner = TaskRunner()
 runner.load_tasks()
+
+# disable default log
+log = logging.getLogger('werkzeug')
+log.disabled = True
+logging.getLogger().setLevel(logging.INFO)
 
 # global
 @app.route('/login', methods=['GET', 'POST'])
@@ -33,7 +39,7 @@ def get_tasks():
     if 'username' in session:
         return render_template('dashboard.html', records=runner.task_queue, status=runner.is_alldone)
     else:
-        return '<div class="spinner-grow text-primary" role="status"><span class="sr-only">Loading...</span></div>'
+        return '<div class="spinner-grow text-primary" role="status"><span class="sr-only"></span></div>'
 
 # for task
 @app.route('/get_task', methods=['POST'])
@@ -76,7 +82,7 @@ def edit_task():
 @app.route('/get_log', methods=['POST'])
 def get_log():
     if 'username' not in session: return render_template('login.html')
-    return runner.get_log(request.form['index']).decode('gbk', 'ignore')
+    return runner.get_log(request.form['index'])
 
 # for main
 @app.route('/global_start', methods=['GET'])
@@ -127,5 +133,10 @@ def download(filename):
     return send_from_directory('tasklists', filename, as_attachment=True) 
 
 if __name__ == '__main__':
+    server_host = '0.0.0.0'
+    server_port = 5000
+    app.logger.warning('Server running at ' + server_host + ":" + str(server_port))
+    
     app.debug = True
-    app.run()
+    app.run(host=server_host, port=server_port)
+

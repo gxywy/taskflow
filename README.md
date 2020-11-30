@@ -19,3 +19,7 @@ python app.py
 **default password: admin**
 
 and you can change password in file "password" **(recommend)**
+
+## Feature
+
+**live logging in both webpage and console！！！**
